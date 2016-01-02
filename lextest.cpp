@@ -7,7 +7,7 @@ extern string str;
 int main()
 {
 	yyFlexLexer x;
-	while (true)
+	while (!cin.eof())
 		x.yylex(), cout << string(str) << endl;	
 	return 0;
 }

@@ -1,14 +1,14 @@
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <cassert>
-#include <cstdio> 
 #include <functional>
 #include <sstream>
 #include <map>
 #include <set>
+#include <FlexLexer.h>
+#include "optype.hpp"
 #define null NULL
 // #include "parser.cpp"
 
@@ -21,7 +21,6 @@ const int LCSZ = 32;
 map<string, vector<string>> func;
 set<string> built_in;
 
-
 void init_func()
 {
 	func["plus"] = { "p {0} + {1}\n" };
@@ -29,11 +28,11 @@ void init_func()
 
 struct VALUE
 {
-	enum op_type
+	enum type
 	{
-		INT, STRING, DOUBLE, HZ
+		INT, STRING, DOUBLE, VOID
 	};
-	op_type t;
+	type t;
 	union
 	{
 		void* data;
@@ -41,7 +40,7 @@ struct VALUE
 		double dv;
 		char cv;
 	};
-	VALUE(op_type t, void* data)
+	VALUE(type t, void* data)
 		: t(t), data(data)
 	{}
 	VALUE(int iv)
@@ -51,7 +50,7 @@ struct VALUE
 		: t(DOUBLE), dv(dv)
 	{}
 	VALUE()
-		: t(HZ), data(null)
+		: t(VOID), data(null)
 	{}
 	VALUE operator !()
 	{
@@ -59,64 +58,65 @@ struct VALUE
 			return VALUE((int)!iv);
 		if (t == DOUBLE)
 			return VALUE((double)!dv);
-		return VALUE(HZ, null);
+		return VALUE(VOID, null);
 	}
-	VALUE operator +(VALUE& other)
+	VALUE operator +(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv + other.iv);
+		return VALUE(VOID, null);
 	}
-	VALUE operator -(VALUE& other)
+	VALUE operator -(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv - other.iv);
 	}
-	VALUE operator *(VALUE& other)
+	VALUE operator *(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv * other.iv);
 	}
-	VALUE operator /(VALUE& other)
+	VALUE operator /(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv / other.iv);
 	}
-	VALUE operator %(VALUE& other)
+	VALUE operator %(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv % other.iv);
 	}
-	VALUE operator &(VALUE& other)
+	VALUE operator &(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv & other.iv);
 	}
-	VALUE operator |(VALUE& other)
+	VALUE operator |(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv | other.iv);
 	}
-	VALUE operator ^(VALUE& other)
+	VALUE operator ^(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv ^ other.iv);
 	}
-	VALUE operator <(VALUE& other)
+	VALUE operator <(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv < other.iv);
 	}
-	VALUE operator >(VALUE& other)
+	VALUE operator >(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv > other.iv);
 	}
-	VALUE operator ==(VALUE& other)
+	VALUE operator ==(VALUE other)
 	{
 		if (t == INT)
 			return VALUE(iv == other.iv);
 	}
-	explicit opeator bool()
+	explicit operator bool()
 	{
 		if (t == INT)
 			return (bool)t;
@@ -130,11 +130,6 @@ VALUE func_call(string name, VALUE* local);
 
 VALUE* arr = new VALUE[2 * SZ] + SZ;
 
-enum op_type
-{
-	MULT, PLUS, MINUS, DIV, MOD, OR, AND, XOR, GOR, GAND, LESS, GREATER, EQUALS, COLON, NEWLINE, WHILE, IF, NOT, BRACES, SBRACES, FBRACES, FUNC_CALL, VAR, NUMBER, LEFTBRACE, RIGHTBRACE, LEFTSBRACE, RIGHTSBRACE, LEFTFBRACE, RIGHTFBRACE, ASSIGN
-};
-
 struct nd
 {
 	vector<nd*> ch;
@@ -146,80 +141,90 @@ struct nd
 	nd(VALUE val);
 };
 
-VALUE exec(vector<nd*>& nds, op_type op_type, VALUE* local)
+VALUE exec(nd* nd, VALUE* local)
 {
-	if (op_type == PLUS)
+	op_type op = nd->t;
+	if (op == PLUS)
 	{
 		return nds[0]->exec(local) + nds[1]->exec(local);
 	}
-	if (op_type == MINUS)
+	if (op == MINUS)
 	{
 		return nds[0]->exec(local) - nds[1]->exec(local);
 	}
-	if (op_type == MULT)
+	if (op == MULT)
 	{
 		return nds[0]->exec(local) * nds[1]->exec(local);
 	}
-	if (op_type == DIV)
+	if (op == DIV)
 	{
 		return nds[0]->exec(local) / nds[1]->exec(local);
 	}
-	if (op_type == MOD)
+	if (op == MOD)
 	{
 		return nds[0]->exec(local) % nds[1]->exec(local);
 	}
-	if (op_type == OR)
+	if (op == OR)
 	{
 		return nds[0]->exec(local) | nds[1]->exec(local);
 	}
-	if (op_type == AND)
+	if (op == AND)
 	{
 		return nds[0]->exec(local) & nds[1]->exec(local);
 	}
-	if (op_type == XOR)
+	if (op == XOR)
 	{
 		return nds[0]->exec(local) ^ nds[1]->exec(local);
 	}
-	if (op_type == GAND)
+	if (op == GAND)
 	{
 		VALUE x = nds[0]->exec(local);
 		if ((bool)x == false)
 			return false;
 		return nds[1]->exec(local);
 	}
-	if (op_type == GOR)
+	if (op == GOR)
 	{
 		VALUE x = nds[0]->exec(local);
 		if ((bool)x == true)
 			return true;
 		return nds[1]->exec(local);
 	}
-	if (op_type == LESS)
+	if (op == LESS)
 	{
 		return nds[0]->exec(local) < nds[1]->exec(local);
 	}
-	if (op_type == GREATER)
+	if (op == GREATER)
 	{
 		return nds[0]->exec(local) > nds[1]->exec(local);
 	}
-	if (op_type == EQUALS)
+	if (op == EQUALS)
 	{
 		return nds[0]->exec(local) == nds[1]->exec(local);
 	}
-	if (op_type == FBRACES)
+	if (op == BRACES)
 	{
 		return local[nds[0]->exec(local).iv];
 	}
-	if (op_type == SBRACES)
+	if (op == BRACKETS)
 	{
 		return arr[nds[0]->exec(local).iv];
 	}
-	if (op_type == FUNC_CALL)
+	if (op == FUNC_CALL)
 	{
 		VALUE* vals = new VALUE[LCSZ + nds.size() - 1];
 		for (int i = 1; i < nds.size(); ++i)
 			vals[LCSZ + i - 1] = nds[i]->exec(local);
 		return func_call(*(string*)(nds[0]->value.data), vals + LCSZ);
+	}
+	if (op == NEWLINE)
+	{
+		exec({ nds[0] }, local);
+		exec({ nds[1] }, local);
+	}
+	if (op == WHILE)
+	{
+
 	}
 }
 
@@ -235,18 +240,25 @@ VALUE nd::exec(VALUE* local)
 	}
 }
 nd::nd(op_type t, vector<nd*> ch)
-	:t(t), ch(ch), value(VALUE::HZ, null)
+	:t(t), ch(ch), value(VALUE::VOID, null)
 {}
 nd::nd(VALUE val)
 	: value(val), t(VAR)
 {}
 
+yyFlexLexer lexer;
+extern string str;
+extern int num;
+
 struct parser
-{
-	string s;
+{	
 	int curch;
+	parser()
+		: curch(0)
+	{}
+
 	parser(string s)
-		: s(s + "$"), curch(0)
+		: curch(0)
 	{}
 
 	nd* parse()
@@ -297,7 +309,7 @@ struct parser
 
 	void init_op_map()
 	{
-		op_map = {
+		/*op_map = {
 			{ "&", AND },
 			{ "|", OR },
 			{ "^", XOR },
@@ -313,16 +325,20 @@ struct parser
 			{ "-", MINUS },
 			{ "*", MULT },
 			{ "/", DIV },
-			{ "%", MOD }
-		};
+			{ "%", MOD },
+			{ "(", LPAREN },
+			{ ")", RPAREN },
+			{ "{", LBRACE },
+			{ "}", RBRACE },
+			{ "[", LBRACKET },
+			{ "]", RBRACKET }
+		};*/
 	}
 
 	op_type next_token()
 	{
-		if (op_map.size() == 0)
-			init_op_map();
-		int ind = curch;
-		
+		auto ans = (op_type)lexer.yylex();
+		return ans;
 	}
 
 	nd* parseLeaf()
@@ -330,37 +346,45 @@ struct parser
 		op_type op = next_token();
 		if (op == NOT)
 		{
-			return new nd(NOT, { parseLeaf() });
+			return new nd(op, { parseLeaf() });
 		}
-		if (op == LEFTBRACE)
+		if (op == LPAREN)
 		{
 			nd* ans = parse();
-			assert(next_token() == RIGHTBRACE);
+			assert(next_token() == RPAREN);
 			return ans;
 		}
-		if (op == LEFTSBRACE)
+		if (op == LBRACKET)
 		{
 			nd* ans = parse();
-			assert(next_token() == RIGHTSBRACE);
-			return new nd(SBRACES, { ans });
+			assert(next_token() == RBRACKET);
+			return new nd(op, { ans });
 		}
-		if (op == LEFTFBRACE)
+		if (op == LBRACE)
 		{
 			nd* ans = parse();
-			assert(next_token() == RIGHTFBRACE);
-			return new nd(FBRACES, { ans });
+			assert(next_token() == RBRACE);
+			return new nd(op, { ans });
 		}
 		if (op == FUNC_CALL)
 		{
-			string name = curs;
+			string name = str;
 			vector<nd*> args = parseArgs();
 			args.insert(args.begin(), new nd(VALUE(VALUE::STRING, new string(name))));
 			for (int i = 0; i < 10; ++i)
-				args.push_back(new nd(VALUE(VALUE::HZ, null)));
-			return new nd(FUNC_CALL, args);
+				args.push_back(new nd(VALUE(VALUE::VOID, null)));
+			return new nd(op, args);
+		}
+		if (op == WHILE)
+		{
+			nd* expr = parse();
+			assert(next_token() == LBRACE);
+			nd* body = parse();
+			assert(next_token() == RBRACE);
+			return new nd(op, { expr, body });
 		}
 		assert(op == NUMBER);
-		int x = atoi(curs.data());
+		int x = num;
 		return new nd(VALUE(x));
 	}
 
@@ -378,39 +402,41 @@ struct parser
 
 	int get_prior(op_type op)
 	{
+		if (op == NEWLINE)
+			return 0;
 		if (op == AND)
-			return 0;
+			return 1;
 		if (op == OR)
-			return 0;
+			return 1;
 		if (op == XOR)
-			return 0;
+			return 1;
 		if (op == GAND)
-			return 1;
-		if (op == GOR)
-			return 1;
-		if (op == ASSIGN)
 			return 2;
+		if (op == GOR)
+			return 2;
+		if (op == ASSIGN)
+			return 3;
 		if (op == LESS)
-			return 3;
+			return 4;
 		if (op == GREATER)
-			return 3;
+			return 4;
 		if (op == EQUALS)
-			return 3;
+			return 4;
 		if (op == PLUS)
-			return 4;
+			return 5;
 		if (op == MINUS)
-			return 4;
+			return 5;
 		if (op == MULT)
-			return 5;
+			return 6;
 		if (op == DIV)
-			return 5;
+			return 6;
 		if (op == MOD)
-			return 5;
+			return 6;
 		return -1;
 	}
 	nd* parse(int prior)
 	{
-		if (prior == 6)
+		if (prior == 7)
 			return parseLeaf();
 		nd* x = parse(prior + 1);
 		op_type tok;
@@ -423,15 +449,15 @@ struct parser
 	
 	vector<nd*> parseArgs()
 	{
-		assert(next_token() == LEFTBRACE);
+		assert(next_token() == LPAREN);
 		vector<nd*> args;
 		op_type tok = next_token();
-		if (tok == RIGHTBRACE)
+		if (tok == RPAREN)
 			return args;
 		args.push_back(parse());
 		while ((tok = next_token()) == COLON)
 			args.push_back(parse());
-		assert(tok == RIGHTBRACE);
+		assert(tok == RPAREN);
 		return args;
 	}
 };
@@ -615,7 +641,7 @@ VALUE func_call(string name, VALUE* local)
 	else
 	{
 		cout << "Undefined function: " << name << endl;
-		return VALUE(VALUE::HZ, null);
+		return VALUE(VALUE::VOID, null);
 	}
 }
 

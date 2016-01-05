@@ -28,13 +28,15 @@ ID       [A-Za-z][_A-Za-z0-9]*
 
 wh return WHILE;
 "if" return IF;
+def return FUNC_DEF;
 ret return RETURN;
 
 {ID} 	{
 			str = string(yytext);
 			return ID;
 		}
-
+"\t" return SPACE;
+"\ " return SPACE;
 "&" return AND;
 "|" return OR;
 "^" return XOR;
@@ -56,6 +58,9 @@ ret return RETURN;
 "[" return LBRACKET;
 "]" return RBRACKET;
 "!" return NOT;
-. return NEWLINE;
+"," return COMMA;
+"\n" return NEWLINE;
+<<EOF>> return NIL;
+. return NIL;
 %%
                

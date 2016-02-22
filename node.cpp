@@ -13,6 +13,7 @@ using std::vector;
 using std::unordered_map;
 using std::pair;
 using std::cin;
+using std::cerr;
 using std::cout;
 
 const int SZ = 500000;
@@ -20,6 +21,11 @@ const int SZ = 500000;
 Vars vars;
 
 VALUE *arr = new VALUE[2 * SZ] + SZ;
+
+void runtime(string msg)
+{
+    cerr << "Runtime exception was occured. Message: " << msg << std::endl;
+}
 
 inline void add_built_in()
 {
@@ -53,12 +59,20 @@ bool func_exists(string name)
     add_built_in();
     return vars.count(name) && vars[name].t == VALUE::FUNCTION;
 }
-VALUE nd::exec(Vars local)
+VALUE nd::exec(Vars& local)
 {
     if (op == NUMBER || op == VAL)
         return value;
     if (op == VAR)
-        return vars[*(string*)value.data];
+    {
+        string name = *(string*)value.data;
+        if (local.count(name))
+            return local[name];
+        else if (vars.count(name))
+            return vars[name];
+        else
+            runtime("No such variable: " + name);
+    }
     if (op == NOT)
         return !left->exec(local);
     if (op == NEG)
@@ -177,7 +191,7 @@ VALUE nd::exec(Vars local)
         {
             string name = *(string*)left->value.data;
             VALUE val = right->exec(local);
-            vars[name] = val;
+            local[name] = val;
         }
         else if (left->op == BRACKETS)
         {
@@ -197,6 +211,11 @@ VALUE nd::exec(Vars local)
         return VALUE();
     assert(false && "Unknown operation");
     return VALUE();
+}
+
+VALUE nd::exec()
+{
+    return exec(vars);
 }
 
 nd::nd(op_type op, nd *left, nd *right)

@@ -13,6 +13,6 @@ int main(int argc, char* argv[])
 	string filename = argc > 1 ? argv[1] : "input.txt";
 	parser a(filename);
 	auto prog = a.parse();
-	prog->exec(Vars());
+	prog->exec();
 	return 0;
 }

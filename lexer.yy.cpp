@@ -445,7 +445,7 @@ static yyconst flex_int16_t yy_chk[84] =
 using namespace std;
 
 string str;
-int num; 
+int num, yyline;
 
 #line 451 "lexer.yy.cpp"
 
@@ -792,23 +792,26 @@ case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
 #line 62 "lexer.cpp"
-return NEWLINE;
+{
+			++yyline;
+			return NEWLINE;
+		}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 63 "lexer.cpp"
+#line 66 "lexer.cpp"
 return NIL;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 64 "lexer.cpp"
+#line 67 "lexer.cpp"
 return NIL;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 65 "lexer.cpp"
+#line 68 "lexer.cpp"
 ECHO;
 	YY_BREAK
-#line 812 "lexer.yy.cpp"
+#line 815 "lexer.yy.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1706,7 +1709,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 65 "lexer.cpp"
+#line 68 "lexer.cpp"
 
 
                

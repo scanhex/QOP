@@ -9,7 +9,7 @@
 using namespace std;
 
 string str;
-int num; 
+int num, yyline;
 
 %}
 
@@ -59,7 +59,10 @@ ret return RETURN;
 "]" return RBRACKET;
 "!" return NOT;
 "," return COMMA;
-"\n" return NEWLINE;
+"\n" 	{
+			++yyline;
+			return NEWLINE;
+		}
 <<EOF>> return NIL;
 . return NIL;
 %%

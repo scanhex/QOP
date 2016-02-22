@@ -6,7 +6,7 @@ struct VALUE
 {
 	enum type
 	{
-		INT, STRING, DOUBLE, TUPLE, FUNCTION, VOID
+		INT, STRING, DOUBLE, TUPLE, NODE, FUNCTION, VOID
 	};
 	type t;
 	union
@@ -66,7 +66,7 @@ struct VALUE
 	}
 	VALUE operator /(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv / other.iv);
 		return VALUE();
 	}
@@ -119,6 +119,7 @@ struct VALUE
 		if (t == DOUBLE)
 			return (bool)dv;
 		assert(false && "Type is not int or double");
+		return false;
 	}
 };
 

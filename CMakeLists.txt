@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 project(QOP)
 #include_directories(/usr/local/opt/flex/include)
-set(SOURCE_FILES lexer.yy.cpp Main.cpp node.cpp value.cpp)
+set(SOURCE_FILES lexer.yy.cpp Main.cpp node.cpp value.cpp builtins.cpp parser.cpp)
 add_executable(QOP ${SOURCE_FILES})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -fsanitize=address")

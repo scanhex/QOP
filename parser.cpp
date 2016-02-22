@@ -3,13 +3,9 @@
 //
 
 #include "parser.hpp"
+#include "function.hpp"
 
 yyFlexLexer lexer(new ifstream("input.txt"));
-
-bool parser::func_exists(string name)
-{
-    return built_in_contains(name) || func_parsed.count(name);
-}
 
 void parser::fail(string s)
 {
@@ -81,13 +77,6 @@ void parser::move_next()
         token = (op_type) lexer.yylex();
     while (token == SPACE)
         token = (op_type) lexer.yylex();
-    if (token == ID)
-    {
-        if (func_exists(str))
-            token = FUNC_CALL;
-        else
-            token = VAR;
-    }
 }
 
 nd *parser::parse_leaf()
@@ -128,20 +117,6 @@ nd *parser::parse_leaf()
         move_next();
         return new nd(BRACES, ans, null);
     }
-    if (token == FUNC_CALL)
-    {
-        string name = str;
-        move_next();
-        vector<nd *> args = parse_args();
-        args.insert(args.begin(), new nd(VAL, VALUE((int) args.size())));
-        for (int i = 0; i < 10; ++i)
-            args.push_back(new nd(VAL, VALUE()));
-        VALUE *tup = new VALUE[args.size()];
-        for (int i = 0; i < args.size(); ++i)
-            tup[i] = VALUE(VALUE::NODE, args[i]);
-        return new nd(FUNC_CALL, new nd(VAL, VALUE(VALUE::STRING, new string(name))),
-                      new nd(VAL, VALUE(VALUE::TUPLE, tup)));
-    }
     if (token == WHILE)
     {
         move_next();
@@ -171,25 +146,48 @@ nd *parser::parse_leaf()
     if (token == FUNC_DEF)
     {
         move_next();
-        assert(token == VAR || token == FUNC_CALL);
+        assert(token == VAR);
         string name = str;
-        func_parsed.insert(name);
         move_next(); // skip name
+        func_signature fs(name, {});
+        if (token == LPAREN)
+        {
+            vector<nd*> args = parse_args();
+            for (auto x : args)
+            {
+                if (x->op != VAR)
+                    fail("Bad argument in function definition");
+                fs.args.push_back(*(string*)x->value.data);
+            }
+        }
         move_next(); // skip newline
         assert(token == LPAREN);
         move_next();
-        nd *body = parse();
+        fs.body = parse();
         if (token != RPAREN)
             fail("Bad parentheses in function definition");
         assert(token == RPAREN);
         move_next(); // skip )
-        return new nd(FUNC_DEF, new nd(VAL, VALUE(VALUE::STRING, new string(name))), body);
+        return new nd(FUNC_DEF, VALUE(VALUE::FUNCTION, new func_signature(fs)));
     }
     if (token == VAR)
     {
-        string s = str;
+        string name = str;
         move_next();
-        return new nd(VAR, VALUE(VALUE::STRING, new string(s)));
+        if (token == LPAREN)
+        {
+            vector<nd *> args = parse_args();
+            args.insert(args.begin(), new nd(VAL, VALUE((int) args.size())));
+            for (int i = 0; i < 10; ++i)
+                args.push_back(new nd(VAL, VALUE()));
+            VALUE *tup = new VALUE[args.size()];
+            for (int i = 0; i < args.size(); ++i)
+                tup[i] = VALUE(VALUE::NODE, args[i]);
+            return new nd(FUNC_CALL, new nd(VAL, VALUE(VALUE::STRING, new string(name))),
+                          new nd(VAL, VALUE(VALUE::TUPLE, tup)));
+        }
+        else
+            return new nd(VAR, VALUE(VALUE::STRING, new string(name)));
     }
     if (token == RETURN)
     {
@@ -262,7 +260,7 @@ nd *parser::parse(int prior)
 vector<nd *> parser::parse_args()
 {
     if (token != LPAREN)
-        fail("Bad parentheses in function call");
+        fail("Bad parentheses in function arguments");
     assert(token == LPAREN);
     vector<nd *> args;
     move_next();

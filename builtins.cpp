@@ -2,40 +2,50 @@
 // Created by Alexander Morozov on 20/02/16.
 //
 
+#include <set>
 #include "builtins.hpp"
+#include "function.hpp"
 
-unordered_set<string> built_in;
+std::set<func_signature> built_in;
+
+func_signature print("print", {"num", "flush"});
+func_signature pc("pc", {"ord"});
+func_signature gint("gint", {});
 
 void init_built_in()
 {
-    built_in.insert("print");
-    built_in.insert("pi");
-    built_in.insert("pc");
+    built_in.insert(print);
+    built_in.insert(pc);
+    built_in.insert(gint);
+}
 
-    built_in.insert("gint");
-    built_in.insert("gi");
+std::set<func_signature>& get_built_in()
+{
+    if (built_in.size() == 0)
+        init_built_in();
+    return built_in;
 }
 
 bool built_in_contains(string s)
 {
-    if (built_in.size() == 0)
-        init_built_in();
-    return built_in.count(s);
+    return s == "print" || s == "pc" || s == "gint";
 }
 
-VALUE call_built_in(string name, VALUE* local)
+VALUE call_built_in(string func, Vars local)
 {
-    if (name == "print" || name == "pi")
+    if (func == print.name)
     {
-        cout << local[0];
-        if (local[1].iv)
+        cout << local["num"];
+        if (local.count("flush") && local["flush"])
             cout.flush();
+        return VALUE();
     }
-    if (name == "pc")
+    if (func == pc.name)
     {
         cout << (char)(local[0].iv);
+        return VALUE();
     }
-    if (name == "gint" || name == "gi")
+    if (func == gint.name)
     {
         int x; cin >> x;
         return VALUE(x);

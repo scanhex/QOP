@@ -24,12 +24,7 @@ extern int num, yyline;
 class parser
 {
 private:
-	unordered_set<string> func_parsed;
-
-	bool func_exists(string name);
-
 	void fail(string s);
-
 
 	nd* parse_leaf();
 

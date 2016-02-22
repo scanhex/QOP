@@ -33,7 +33,7 @@ ret return RETURN;
 
 {ID} 	{
 			str = string(yytext);
-			return ID;
+			return VAR;
 		}
 "\t" return SPACE;
 "\ " return SPACE;

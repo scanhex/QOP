@@ -434,9 +434,9 @@ static yyconst flex_int16_t yy_chk[84] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "lexer.cpp"
+#line 1 "lexer.y"
 /* scanner for a toy Pascal-like language */
-#line 4 "lexer.cpp"
+#line 4 "lexer.y"
 /* need this for the call to atof() below */
 #include <math.h>
 #include <iostream>
@@ -547,7 +547,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 23 "lexer.cpp"
+#line 23 "lexer.y"
 
 #line 553 "lexer.yy.cpp"
 
@@ -634,7 +634,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 24 "lexer.cpp"
+#line 24 "lexer.y"
 {
              	num = atoi( yytext ); 
             	return NUMBER;
@@ -642,173 +642,173 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 29 "lexer.cpp"
+#line 29 "lexer.y"
 return WHILE;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 30 "lexer.cpp"
+#line 30 "lexer.y"
 return IF;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 31 "lexer.cpp"
+#line 31 "lexer.y"
 return FUNC_DEF;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 32 "lexer.cpp"
+#line 32 "lexer.y"
 return RETURN;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 34 "lexer.cpp"
+#line 34 "lexer.y"
 {
 			str = string(yytext);
-			return ID;
+			return VAR;
 		}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 38 "lexer.cpp"
+#line 38 "lexer.y"
 return SPACE;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 39 "lexer.cpp"
+#line 39 "lexer.y"
 return SPACE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 40 "lexer.cpp"
+#line 40 "lexer.y"
 return AND;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 41 "lexer.cpp"
+#line 41 "lexer.y"
 return OR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 42 "lexer.cpp"
+#line 42 "lexer.y"
 return XOR;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 43 "lexer.cpp"
+#line 43 "lexer.y"
 return ASSIGN;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 44 "lexer.cpp"
+#line 44 "lexer.y"
 return GAND;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 45 "lexer.cpp"
+#line 45 "lexer.y"
 return GOR;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 46 "lexer.cpp"
+#line 46 "lexer.y"
 return LESS;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 47 "lexer.cpp"
+#line 47 "lexer.y"
 return GREATER;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 48 "lexer.cpp"
+#line 48 "lexer.y"
 return EQUALS;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 49 "lexer.cpp"
+#line 49 "lexer.y"
 return PLUS;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 50 "lexer.cpp"
+#line 50 "lexer.y"
 return MINUS; 
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 51 "lexer.cpp"
+#line 51 "lexer.y"
 return MULT;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 52 "lexer.cpp"
+#line 52 "lexer.y"
 return DIV;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 53 "lexer.cpp"
+#line 53 "lexer.y"
 return MOD;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 54 "lexer.cpp"
+#line 54 "lexer.y"
 return LPAREN;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 55 "lexer.cpp"
+#line 55 "lexer.y"
 return RPAREN;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 56 "lexer.cpp"
+#line 56 "lexer.y"
 return LBRACE;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 57 "lexer.cpp"
+#line 57 "lexer.y"
 return RBRACE;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 58 "lexer.cpp"
+#line 58 "lexer.y"
 return LBRACKET;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 59 "lexer.cpp"
+#line 59 "lexer.y"
 return RBRACKET;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 60 "lexer.cpp"
+#line 60 "lexer.y"
 return NOT;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 61 "lexer.cpp"
+#line 61 "lexer.y"
 return COMMA;
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 62 "lexer.cpp"
+#line 62 "lexer.y"
 {
 			++yyline;
 			return NEWLINE;
 		}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 66 "lexer.cpp"
+#line 66 "lexer.y"
 return NIL;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 67 "lexer.cpp"
+#line 67 "lexer.y"
 return NIL;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 68 "lexer.cpp"
+#line 68 "lexer.y"
 ECHO;
 	YY_BREAK
 #line 815 "lexer.yy.cpp"
@@ -1709,7 +1709,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 68 "lexer.cpp"
+#line 68 "lexer.y"
 
 
                

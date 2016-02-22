@@ -1,0 +1,7 @@
+def sum(a, b)
+(
+    a + b
+)
+a = gint()
+b = gint()
+print(sum(a, b))

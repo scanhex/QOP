@@ -1,7 +1,76 @@
-def sum(c, d)
+def parse_int
 (
-    c + d
+    if [cur] == '('
+    (
+        @cur = cur + 1
+        a = parse()
+        @cur = cur + 1
+        a
+    )
+    else
+    (
+        kek = 0
+        wh '0' <= [cur] && [cur] <= '9'
+        (
+            kek = kek * 10
+            kek = kek + [cur] - '0'
+            @cur = cur + 1
+        )
+        kek
+    )
 )
-a = gint()
-b = gint()
-print(sum(a, b))
+
+def parse_mult
+(
+    a = parse_int()
+    wh [cur] == '*' || [cur] == '/'
+    (
+        b = [cur]
+        @cur = cur + 1
+        x = parse_int()
+        if b == '*'
+        (
+            a = a * x
+        )
+        else
+        (
+            a = a / x
+        )
+    )
+    a
+)
+
+def parse
+(
+    a = parse_mult()
+    wh [cur] == '-' || [cur] == '+'
+    (
+        b = [cur]
+        @cur = cur + 1
+        x = parse_mult()
+        if b == '+'
+        (
+            a = a + x
+        )
+        else
+        (
+            a = a - x
+        )
+    )
+    a
+)
+
+cur = 0
+i = 0
+a = 11
+wh a > 10
+(
+    a = gc()
+    if a > 11
+    (
+        [i] = a
+        i = i + 1
+    )
+)
+[i] = '#'
+println(parse())

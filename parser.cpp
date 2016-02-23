@@ -95,6 +95,8 @@ nd *parser::parse_leaf()
     {
         move_next();
         nd *ans = parse();
+        if (token != RPAREN)
+            fail("Bad parentheses in expression");
         assert(token == RPAREN);
         move_next();
         return ans;
@@ -138,10 +140,24 @@ nd *parser::parse_leaf()
         move_next();
         nd *body = parse();
         if (token != RPAREN)
-            fail("Bad IF parentheses");
+            fail("Bad if parentheses");
         assert(token == RPAREN);
-        move_next();
-        return new nd(IF, expr, body);
+        move_next(); // now it is else or newline
+        if (token == ELSE)
+        {
+            move_next(); // now it is newline
+            move_next(); // now it is (
+            assert(token == LPAREN);
+            move_next();
+            nd *body1 = parse();
+            if (token != RPAREN)
+                fail("Bad else parentheses");
+            assert(token == RPAREN);
+            move_next();
+            return new nd(IF, expr, new nd(ELSE, body, body1));
+        }
+        else
+            return new nd(IF, expr, body);
     }
     if (token == FUNC_DEF)
     {
@@ -161,6 +177,8 @@ nd *parser::parse_leaf()
             }
         }
         move_next(); // skip newline
+        if (token != LPAREN)
+            fail("Bad parentheses in function definition");
         assert(token == LPAREN);
         move_next();
         fs.body = parse();
@@ -225,7 +243,13 @@ int parser::get_prior(op_type op)
         return 4;
     if (op == GREATER)
         return 4;
+    if (op == LEQ)
+        return 4;
+    if (op == GREQ)
+        return 4;
     if (op == EQUALS)
+        return 4;
+    if (op == NEQUALS)
         return 4;
     if (op == PLUS)
         return 5;

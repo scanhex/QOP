@@ -18,48 +18,62 @@ int num, yyline;
 %option outfile="lexer.yy.cpp"         
                       
 DIGIT    [0-9]
-ID       [A-Za-z][_A-Za-z0-9]*
+ID       @?[A-Za-z][_A-Za-z0-9]*
+POINT '.'
+TRAIL   [ \t]*
 
 %%
-{DIGIT}+    {
+{DIGIT}+{TRAIL}    {
              	num = atoi( yytext ); 
             	return NUMBER;
 			}
 
-wh return WHILE;
-"if" return IF;
-def return FUNC_DEF;
-ret return RETURN;
+{POINT}{TRAIL}  {
+            num = yytext[1];
+            return NUMBER;
+        }
 
-{ID} 	{
+wh{TRAIL} return WHILE;
+"if"{TRAIL} return IF;
+"\n"{TRAIL}"else"{TRAIL} {
+            ++yyline;
+            return ELSE;
+         }
+def{TRAIL} return FUNC_DEF;
+ret{TRAIL} return RETURN;
+
+{ID}{TRAIL} 	{
 			str = string(yytext);
+			while (str[str.size() - 1] == ' ' || str[str.size() - 1] == '\t')
+			    str.pop_back();
 			return VAR;
 		}
-"\t" return SPACE;
-"\ " return SPACE;
-"&" return AND;
-"|" return OR;
-"^" return XOR;
-"=" return ASSIGN;
-"&&" return GAND;
-"||" return GOR;
-"<" return LESS;
-">" return GREATER;
-"?" return EQUALS;
-"+" return PLUS;
-"-" return MINUS; 
-"*" return MULT;
-"/" return DIV;
-"%" return MOD;
-"(" return LPAREN;
-")" return RPAREN;
-"{" return LBRACE;
-"}" return RBRACE;
-"[" return LBRACKET;
-"]" return RBRACKET;
-"!" return NOT;
-"," return COMMA;
-"\n" 	{
+"&"{TRAIL} return AND;
+"|"{TRAIL} return OR;
+"^"{TRAIL} return XOR;
+"="{TRAIL} return ASSIGN;
+"&&"{TRAIL} return GAND;
+"||"{TRAIL} return GOR;
+"<"{TRAIL} return LESS;
+">"{TRAIL} return GREATER;
+"<="{TRAIL} return LEQ;
+">="{TRAIL} return GREQ;
+"=="{TRAIL} return EQUALS;
+"!="{TRAIL} return NEQUALS;
+"+"{TRAIL} return PLUS;
+"-"{TRAIL} return MINUS;
+"*"{TRAIL} return MULT;
+"/"{TRAIL} return DIV;
+"%"{TRAIL} return MOD;
+"("{TRAIL} return LPAREN;
+")"{TRAIL} return RPAREN;
+"{"{TRAIL} return LBRACE;
+"}"{TRAIL} return RBRACE;
+"["{TRAIL} return LBRACKET;
+"]"{TRAIL} return RBRACKET;
+"!"{TRAIL} return NOT;
+","{TRAIL} return COMMA;
+("\n"{TRAIL})+ 	{
 			++yyline;
 			return NEWLINE;
 		}

@@ -24,7 +24,7 @@ VALUE *arr = new VALUE[2 * SZ] + SZ;
 
 void runtime(string msg)
 {
-    cerr << "Runtime exception was occured. Message: " << msg << std::endl;
+    cerr << "Runtime exception has occured. Message: " << msg << std::endl;
 }
 
 inline void add_built_in()
@@ -48,7 +48,7 @@ VALUE func_call(string name, Vars local)
     }
     else
     {
-        auto sign = (func_signature*)vars[name].data;
+        auto sign = (func_signature *) vars[name].data;
         auto x = sign->body->exec(local);
         return x;
     }
@@ -59,13 +59,14 @@ bool func_exists(string name)
     add_built_in();
     return vars.count(name) && vars[name].t == VALUE::FUNCTION;
 }
-VALUE nd::exec(Vars& local)
+
+VALUE nd::exec(Vars &local)
 {
     if (op == NUMBER || op == VAL)
         return value;
     if (op == VAR)
     {
-        string name = *(string*)value.data;
+        string name = *(string *) value.data;
         if (local.count(name))
             return local[name];
         else if (vars.count(name))
@@ -131,9 +132,21 @@ VALUE nd::exec(Vars& local)
     {
         return left->exec(local) > right->exec(local);
     }
+    if (op == LEQ)
+    {
+        return left->exec(local) <= right->exec(local);
+    }
+    if (op == GREQ)
+    {
+        return left->exec(local) >= right->exec(local);
+    }
     if (op == EQUALS)
     {
         return left->exec(local) == right->exec(local);
+    }
+    if (op == NEQUALS)
+    {
+        return left->exec(local) != right->exec(local);
     }
 //    if (op == BRACES)
 //    {
@@ -146,20 +159,20 @@ VALUE nd::exec(Vars& local)
     if (op == FUNC_CALL)
     {
         assert(right->value.t == VALUE::TUPLE);
-        string name = *(string*) left->value.data;
+        string name = *(string *) left->value.data;
         assert(func_exists(name));
-        auto sign = *(func_signature*) vars[name].data;
-        VALUE *tup = (VALUE*) (right->value.data);
-        int cnt = ((nd*)tup[0].data)->value.iv;
+        auto sign = *(func_signature *) vars[name].data;
+        VALUE *tup = (VALUE *) (right->value.data);
+        int cnt = ((nd *) tup[0].data)->value.iv;
         Vars args;
         for (int i = 0; i < cnt; ++i)
-            args[sign.args[i]] = ((nd*)tup[i + 1].data)->exec(local);
+            args[sign.args[i]] = ((nd *) tup[i + 1].data)->exec(local);
         return func_call(name, args);
     }
     if (op == FUNC_DEF)
     {
         assert(value.t == VALUE::FUNCTION);
-        auto fs = *(func_signature*)value.data;
+        auto fs = *(func_signature *) value.data;
         vars[fs.name] = value;
         return VALUE();
     }
@@ -181,7 +194,14 @@ VALUE nd::exec(Vars& local)
     }
     if (op == IF)
     {
-        if ((bool) (left->exec(local)))
+        if (right->op == ELSE)
+        {
+            if ((bool) left->exec(local))
+                return right->left->exec(local);
+            else
+                return right->right->exec(local);
+        }
+        else if ((bool) (left->exec(local)))
             return right->exec(local);
         return VALUE();
     }
@@ -189,15 +209,23 @@ VALUE nd::exec(Vars& local)
     {
         if (left->op == VAR)
         {
-            string name = *(string*)left->value.data;
+            string name = *(string *) left->value.data;
             VALUE val = right->exec(local);
-            local[name] = val;
+            if (name[0] == '@')
+            {
+                name.erase(name.begin());
+                vars[name] = val;
+            }
+            else
+                local[name] = val;
+            return val;
         }
         else if (left->op == BRACKETS)
         {
             int ind = left->left->exec(local).iv;
             VALUE val = right->exec(local);
             arr[ind] = val;
+            return val;
         }
 //        else if (left->op == BRACES)
 //        {

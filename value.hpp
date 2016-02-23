@@ -48,19 +48,19 @@ struct VALUE
 	}
 	VALUE operator +(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv + other.iv);
 		return VALUE();
 	}
 	VALUE operator -(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv - other.iv);
 		return VALUE();
 	}
 	VALUE operator *(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv * other.iv);
 		return VALUE();
 	}
@@ -72,44 +72,62 @@ struct VALUE
 	}
 	VALUE operator %(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv % other.iv);
 		return VALUE();
 	}
 	VALUE operator &(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv & other.iv);
 		return VALUE();
 	}
 	VALUE operator |(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv | other.iv);
 		return VALUE();
 	}
 	VALUE operator ^(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv ^ other.iv);
 		return VALUE();
 	}
 	VALUE operator <(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv < other.iv);
 		return VALUE();
 	}
 	VALUE operator >(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv > other.iv);
+		return VALUE();
+	}
+	VALUE operator <=(VALUE other)
+	{
+		if (t == INT && other.t == INT)
+			return VALUE(iv <= other.iv);
+		return VALUE();
+	}
+	VALUE operator >=(VALUE other)
+	{
+		if (t == INT && other.t == INT)
+			return VALUE(iv >= other.iv);
 		return VALUE();
 	}
 	VALUE operator ==(VALUE other)
 	{
-		if (t == INT)
+		if (t == INT && other.t == INT)
 			return VALUE(iv == other.iv);
+		return VALUE();
+	}
+	VALUE operator !=(VALUE other)
+	{
+		if (t == INT && other.t == INT)
+			return VALUE(iv != other.iv);
 		return VALUE();
 	}
 	explicit operator bool()

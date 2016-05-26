@@ -1,5 +1,6 @@
 # QOP
 Simple scripting language similar to the ruby and python.
+*Migrated from my old account*
 
 ## Building
 You need Flex.

@@ -15,7 +15,7 @@ Assume you script is named script.qop
 ```
 qop script.qop
 ```
-
+See input.qop for array-based mergesort implementation and input2.qop for variable-based arithmetic expression evaluation implementation
 ## License
 QOP
 Copyright (C) 2016-2016 Alexander Morozov

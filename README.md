@@ -1,6 +1,21 @@
 # QOP
 Simple scripting language similar to the ruby and python.
 
+## Building
+You need Flex.
+Just use CMake.
+
+## How to run
+### Running interpreter
+```
+qop
+```
+### Executing script
+Assume you script is named script.qop
+```
+qop script.qop
+```
+
 ## License
 QOP
 Copyright (C) 2016-2016 Alexander Morozov
